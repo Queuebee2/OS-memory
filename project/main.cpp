@@ -16,8 +16,11 @@
 using namespace std;
 
 // size of the image
-const int64_t SIZE = 16384ULL;
-const int64_t REPEAT = 1ULL;
+// 8000 and 16 with the initial code had a consistent runtime of ~20 seconds on
+// our system.
+// with the current adaptations to the loops in lines 45-56, the runtime is ~4 seconds
+const int64_t SIZE =    8000ULL;	// default value was 16384ULL;
+const int64_t REPEAT =  16ULL; 		// default was 1ULL;
 
 int main(int argc, char* argv[]) {
 	float* res = new float[SIZE * SIZE];  // result of mean filter
@@ -39,23 +42,23 @@ int main(int argc, char* argv[]) {
 	// A pixel in the output image is calculated by averaging 9 pixels: the pixel at the same
 	// coordinates in the input image, and the adjecent pixels.
 	for (int64_t r = 0; r < REPEAT; ++r) {
-		for (int64_t i = 1; i < SIZE - 1; i++) {
-			for (int64_t j = 1; j < SIZE - 1; j++) {
+		for (int64_t j = 1; j < SIZE - 1; j++) {
+			for (int64_t i = 1; i < SIZE - 1; i++) {
 				res[j * SIZE + i] = 0;
-				for (long k = -1; k < 2; k++) {
-					for (long l = -1; l < 2; l++) {
+				for (long l = -1; l < 2; l++) {
+					for (long k = -1; k < 2; k++) {
 						res[j * SIZE + i] += img[(j + l) * SIZE + i + k];
 					}
 				}
 				res[j * SIZE + i] /= 9;
-			}
-		}
-
-		for (int64_t i = 1; i < SIZE - 1; i++) {
-			for (int64_t j = 1; j < SIZE - 1; j++) {
 				dummy += res[j * SIZE + i];
 			}
-		}
+		}	
+		// merged with previous for (i=1 < size) loop for (int64_t i = 1; i < SIZE - 1; i++) {
+		// merged with previous for (j=1 < size) loop for (int64_t j = 1; j < SIZE - 1; j++) {
+				// writing to dummy value moved to line 54
+		// 	}
+		// }
 	}
 
 	// ADJUST ABOVE, BUT keep writing to the dummy variable
